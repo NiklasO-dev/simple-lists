@@ -36,14 +36,20 @@ def list_session_key(share_token: str) -> str:
     return f"list_access_{share_token}"
 
 
-def grant_list_access(share_token: str) -> None:
-    session[list_session_key(share_token)] = True
+def grant_list_access(share_token: str, access_version: int) -> None:
+    session[list_session_key(share_token)] = access_version
 
 
-def has_list_access(share_token: str, list_password_hash: str | None) -> bool:
+def revoke_list_access(share_token: str) -> None:
+    session.pop(list_session_key(share_token), None)
+
+
+def has_list_access(
+    share_token: str, list_password_hash: str | None, access_version: int
+) -> bool:
     if not list_password_hash:
         return True
-    return session.get(list_session_key(share_token)) is True
+    return session.get(list_session_key(share_token)) == access_version
 
 
 def require_csrf():

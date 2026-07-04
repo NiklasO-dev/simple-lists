@@ -19,10 +19,12 @@
         </button>
       </form>
       <span class="item-text">{{ item.text }}</span>
-      <form method="post" action="{% if is_host_view %}{{ url_for('host.delete_item', list_id=todo_list.id, item_id=item.id) }}{% else %}{{ url_for('list.delete_item', share_token=todo_list.share_token, item_id=item.id) }}{% endif %}" class="delete-form">
+      {% if is_host_view %}
+      <form method="post" action="{{ url_for('host.delete_item', list_id=todo_list.id, item_id=item.id) }}" class="delete-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit" class="item-delete outline secondary" aria-label="Delete item">×</button>
       </form>
+      {% endif %}
     </li>
     {% endfor %}
   </ul>

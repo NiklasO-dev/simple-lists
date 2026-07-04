@@ -45,5 +45,20 @@ def create_app(config_class: type = Config) -> Flask:
 
     with app.app_context():
         db.create_all()
+        _migrate_schema()
 
     return app
+
+
+def _migrate_schema() -> None:
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(db.engine)
+    if "lists" not in inspector.get_table_names():
+        return
+    columns = {col["name"] for col in inspector.get_columns("lists")}
+    if "access_version" not in columns:
+        with db.engine.begin() as conn:
+            conn.execute(
+                text("ALTER TABLE lists ADD COLUMN access_version INTEGER NOT NULL DEFAULT 0")
+            )

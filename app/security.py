@@ -19,9 +19,25 @@ def _serializer(secret_key: str) -> URLSafeSerializer:
 
 
 def generate_csrf_token(secret_key: str) -> str:
+    existing = session.get("csrf_token")
+    if existing:
+        try:
+            _serializer(secret_key).loads(existing)
+            return existing
+        except BadSignature:
+            pass
     token = _serializer(secret_key).dumps({"nonce": secrets.token_hex(16)})
     session["csrf_token"] = token
     return token
+
+
+def is_valid_share_token(token: str | None) -> bool:
+    if not token or not isinstance(token, str):
+        return False
+    if len(token) < 20 or len(token) > 64:
+        return False
+    allowed = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
+    return all(c in allowed for c in token)
 
 
 def validate_csrf_token(secret_key: str, token: str | None) -> bool:

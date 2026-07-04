@@ -22,6 +22,7 @@ class TodoList(db.Model):
     )
     password_hash: Mapped[str | None] = mapped_column(String(256), nullable=True)
     password_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    access_version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     items_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, default=utcnow
@@ -109,10 +110,15 @@ class TodoList(db.Model):
         return data
 
     @classmethod
-    def from_import_dict(cls, data: dict, secret_key: str) -> "TodoList":
+    def from_import_dict(
+        cls, data: dict, secret_key: str, share_token: str | None = None
+    ) -> "TodoList":
+        from app.security import encrypt_list_password, hash_list_password, is_valid_share_token
+
         todo_list = cls(title=data.get("title", "Imported list")[:200])
-        if data.get("share_token"):
-            todo_list.share_token = data["share_token"]
+        token = share_token or data.get("share_token")
+        if token and is_valid_share_token(str(token)):
+            todo_list.share_token = str(token)
         items = []
         for raw in data.get("items", []):
             if not isinstance(raw, dict):
@@ -130,18 +136,22 @@ class TodoList(db.Model):
         todo_list.set_items(items)
         password = data.get("password")
         if password:
-            from app.security import encrypt_list_password, hash_list_password
-
             todo_list.password_hash = hash_list_password(str(password))
             todo_list.password_encrypted = encrypt_list_password(secret_key, str(password))
+            todo_list.access_version = 1
         return todo_list
+
+    def bump_access_version(self) -> None:
+        self.access_version = (self.access_version or 0) + 1
 
     def set_list_password(self, secret_key: str, password: str) -> None:
         from app.security import encrypt_list_password, hash_list_password
 
         self.password_hash = hash_list_password(password)
         self.password_encrypted = encrypt_list_password(secret_key, password)
+        self.bump_access_version()
 
     def clear_list_password(self) -> None:
         self.password_hash = None
         self.password_encrypted = None
+        self.bump_access_version()

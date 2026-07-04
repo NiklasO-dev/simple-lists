@@ -1,6 +1,5 @@
-const CACHE = "simple-lists-v1";
-const PRECACHE = [
-  "/",
+const CACHE = "simple-lists-v2";
+const STATIC_ASSETS = [
   "/static/style.css",
   "/static/app.js",
   "/static/manifest.webmanifest",
@@ -9,9 +8,13 @@ const PRECACHE = [
   "/static/icons/apple-touch-icon.png",
 ];
 
+function isStaticAsset(pathname) {
+  return pathname.startsWith("/static/");
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
+    caches.open(CACHE).then((cache) => cache.addAll(STATIC_ASSETS)).then(() => self.skipWaiting())
   );
 });
 
@@ -28,19 +31,24 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type !== "basic") {
+  if (isStaticAsset(url.pathname)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200 && response.type === "basic") {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+          }
           return response;
-        }
-        if (url.pathname.startsWith("/static/")) {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
-        }
-        return response;
-      });
-    })
+        });
+      })
+    );
+    return;
+  }
+
+  // HTML and API routes: network-first — never serve cached private pages.
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });

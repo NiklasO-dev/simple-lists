@@ -16,8 +16,6 @@ from io import BytesIO
 
 from app import db
 from app.auth import (
-    grant_list_access,
-    has_list_access,
     host_required,
     login_host,
     logout_host,
@@ -25,7 +23,9 @@ from app.auth import (
     verify_host_password,
 )
 from app.models import TodoList
+from app.rate_limit import clear_attempts, is_rate_limited, record_failed_attempt
 from app.routes.public import build_share_url
+from app.security import generate_item_id, generate_token, is_valid_share_token
 
 bp = Blueprint("host", __name__, url_prefix="/host")
 
@@ -34,13 +34,18 @@ bp = Blueprint("host", __name__, url_prefix="/host")
 def login():
     if request.method == "POST":
         require_csrf()
+        if is_rate_limited("host_login"):
+            flash("Too many failed attempts. Please wait a few minutes and try again.", "error")
+            return render_template("host/login.html"), 429
         password = request.form.get("password", "")
         if verify_host_password(password):
+            clear_attempts("host_login")
             login_host()
             next_url = request.args.get("next") or request.form.get("next")
             if next_url and next_url.startswith("/host"):
                 return redirect(next_url)
             return redirect(url_for("host.dashboard"))
+        record_failed_attempt("host_login")
         flash("Incorrect password.", "error")
     return render_template("host/login.html")
 
@@ -101,8 +106,6 @@ def update_settings(list_id: int):
         todo_list.clear_list_password()
 
     if request.form.get("regenerate_token"):
-        from app.security import generate_token
-
         todo_list.share_token = generate_token()
 
     db.session.commit()
@@ -211,22 +214,57 @@ def import_lists():
         TodoList.query.delete()
         db.session.commit()
 
+    seen_tokens: set[str] = set(
+        t for (t,) in db.session.query(TodoList.share_token).all()
+    ) if mode == "merge" else set()
     imported = 0
+    secret_key = current_app.config["SECRET_KEY"]
+
     for entry in lists_data:
         if not isinstance(entry, dict):
             continue
-        todo_list = TodoList.from_import_dict(entry, current_app.config["SECRET_KEY"])
-        if mode == "merge":
-            existing = TodoList.query.filter_by(share_token=todo_list.share_token).first()
-            if existing:
-                existing.title = todo_list.title
-                existing.items_json = todo_list.items_json
-                existing.password_hash = todo_list.password_hash
-                existing.password_encrypted = todo_list.password_encrypted
+
+        raw_token = entry.get("share_token")
+        token: str
+        if raw_token and is_valid_share_token(str(raw_token)):
+            candidate = str(raw_token)
+            if candidate in seen_tokens:
+                token = generate_token()
             else:
-                db.session.add(todo_list)
+                token = candidate
         else:
-            db.session.add(todo_list)
+            token = generate_token()
+        seen_tokens.add(token)
+
+        existing = (
+            TodoList.query.filter_by(share_token=token).first() if mode == "merge" else None
+        )
+        if existing:
+            existing.title = (entry.get("title") or existing.title)[:200]
+            items = []
+            for raw in entry.get("items", []):
+                if not isinstance(raw, dict):
+                    continue
+                text = str(raw.get("text", "")).strip()
+                if not text:
+                    continue
+                items.append(
+                    {
+                        "id": generate_item_id(),
+                        "text": text[:500],
+                        "completed": bool(raw.get("completed", False)),
+                    }
+                )
+            existing.set_items(items)
+            if entry.get("password"):
+                existing.set_list_password(secret_key, str(entry["password"]))
+            elif entry.get("locked") is False:
+                existing.clear_list_password()
+            imported += 1
+            continue
+
+        todo_list = TodoList.from_import_dict(entry, secret_key, token)
+        db.session.add(todo_list)
         imported += 1
 
     db.session.commit()
