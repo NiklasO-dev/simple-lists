@@ -1,0 +1,42 @@
+{% if todo_list is defined %}
+{% set is_host_view = request.endpoint and request.endpoint.startswith('host.') %}
+{% else %}
+{% set is_host_view = false %}
+{% endif %}
+
+<section class="items-section">
+  <h2>{% if is_host_view %}Items{% else %}List{% endif %}</h2>
+
+  {% set items = todo_list.get_items() %}
+  {% if items %}
+  <ul class="todo-items">
+    {% for item in items %}
+    <li class="todo-item{% if item.completed %} completed{% endif %}">
+      <form method="post" action="{% if is_host_view %}{{ url_for('host.toggle_item', list_id=todo_list.id, item_id=item.id) }}{% else %}{{ url_for('list.toggle_item', share_token=todo_list.share_token, item_id=item.id) }}{% endif %}" class="toggle-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="item-check" aria-label="{% if item.completed %}Mark incomplete{% else %}Mark complete{% endif %}">
+          <span class="check-icon">{% if item.completed %}✓{% else %}○{% endif %}</span>
+        </button>
+      </form>
+      <span class="item-text">{{ item.text }}</span>
+      {% if is_host_view %}
+      <form method="post" action="{{ url_for('host.delete_item', list_id=todo_list.id, item_id=item.id) }}" class="delete-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="item-delete outline secondary" aria-label="Delete item">×</button>
+      </form>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="empty-state">No items yet. Add one below.</p>
+  {% endif %}
+
+  <form method="post" action="{% if is_host_view %}{{ url_for('host.add_item', list_id=todo_list.id) }}{% else %}{{ url_for('list.add_item', share_token=todo_list.share_token) }}{% endif %}" class="add-item-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="inline-add">
+      <input type="text" name="text" placeholder="Add an item…" required aria-label="New item">
+      <button type="submit">Add</button>
+    </div>
+  </form>
+</section>

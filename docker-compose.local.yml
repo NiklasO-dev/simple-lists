@@ -1,0 +1,16 @@
+services:
+  simple-lists:
+    build: .
+    container_name: simple-lists-local
+    restart: "no"
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: sqlite:////data/simple_lists.db
+      SECRET_KEY: dev-local-secret-change-me
+      HOST_PASSWORD: dev-host-password
+      APP_BASE_URL: http://localhost:8080
+      BEHIND_PROXY: "0"
+      SL_ALLOW_DEV_SECRET: "1"
+    volumes:
+      - ./data:/data

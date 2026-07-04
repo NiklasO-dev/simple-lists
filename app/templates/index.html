@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Simple Lists{% endblock %}
+
+{% block content %}
+<article class="landing">
+  <header class="landing-header">
+    <img src="{{ url_for('static', filename='icons/icon-192.png') }}" alt="" class="landing-icon" width="72" height="72">
+    <h1>Simple Lists</h1>
+  </header>
+
+  <p class="landing-lead">
+    This is a <strong>private list app</strong> for personal or small-group use.
+    Shared lists are opened via direct links — not from this page.
+  </p>
+
+  <p>
+    For more information, visit the
+    <a href="{{ git_repo_url }}" target="_blank" rel="noopener">GitHub repository</a>.
+  </p>
+
+  <section class="owner-section" id="owner">
+    <h2>Owner access</h2>
+    <p>If you are the owner, enter the host password to manage your lists.</p>
+
+    <form method="post" action="{{ url_for('host.login') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="from_landing" value="1">
+      <label>
+        Host password
+        <input type="password" name="password" required autofocus autocomplete="current-password">
+      </label>
+      <button type="submit">Continue</button>
+    </form>
+  </section>
+
+  <details class="install-hint">
+    <summary>Add to home screen</summary>
+    <p>Install this app like a native shortcut for quick access:</p>
+    <ul>
+      <li><strong>iPhone / iPad:</strong> Share → <em>Add to Home Screen</em></li>
+      <li><strong>Android:</strong> Browser menu → <em>Install app</em> or <em>Add to Home screen</em></li>
+    </ul>
+  </details>
+</article>
+{% endblock %}

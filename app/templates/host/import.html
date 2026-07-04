@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Import lists — Simple Lists{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <p><a href="{{ url_for('host.dashboard') }}">← All lists</a></p>
+  <h1>Import lists</h1>
+</header>
+
+<article>
+  <p>Upload a JSON file previously exported from Simple Lists.</p>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>
+      JSON file
+      <input type="file" name="file" accept="application/json,.json" required>
+    </label>
+
+    <fieldset>
+      <legend>Import mode</legend>
+      <label class="checkbox-label">
+        <input type="radio" name="mode" value="merge" checked>
+        Merge — update lists with matching share tokens, add new ones
+      </label>
+      <label class="checkbox-label">
+        <input type="radio" name="mode" value="replace">
+        Replace — delete all existing lists and import from file
+      </label>
+    </fieldset>
+
+    <button type="submit">Import</button>
+  </form>
+</article>
+{% endblock %}
