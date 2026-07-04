@@ -5,7 +5,7 @@
 {% endif %}
 
 <section class="items-section">
-  <h2>{% if is_host_view %}Items{% else %}List{% endif %}</h2>
+  {% if not is_host_view %}<h2>List</h2>{% endif %}
 
   {% set items = todo_list.get_items() %}
   {% if items %}

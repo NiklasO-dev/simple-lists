@@ -1,4 +1,4 @@
-const CACHE = "simple-lists-v2";
+const CACHE = "simple-lists-v3";
 const STATIC_ASSETS = [
   "/static/style.css",
   "/static/app.js",
@@ -10,6 +10,14 @@ const STATIC_ASSETS = [
 
 function isStaticAsset(pathname) {
   return pathname.startsWith("/static/");
+}
+
+function cacheResponse(request, response) {
+  if (response && response.status === 200 && response.type === "basic") {
+    const copy = response.clone();
+    caches.open(CACHE).then((cache) => cache.put(request, copy));
+  }
+  return response;
 }
 
 self.addEventListener("install", (event) => {
@@ -31,24 +39,15 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  if (isStaticAsset(url.pathname)) {
-    event.respondWith(
-      caches.match(event.request).then((cached) => {
-        if (cached) return cached;
-        return fetch(event.request).then((response) => {
-          if (response && response.status === 200 && response.type === "basic") {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(event.request, copy));
-          }
-          return response;
-        });
-      })
-    );
-    return;
-  }
-
-  // HTML and API routes: network-first — never serve cached private pages.
+  // Network-first for everything so UI updates are picked up after deploys.
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request)
+      .then((response) => {
+        if (isStaticAsset(url.pathname)) {
+          return cacheResponse(event.request, response);
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

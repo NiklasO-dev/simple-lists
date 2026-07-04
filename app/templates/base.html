@@ -14,7 +14,7 @@
   <link rel="icon" href="{{ url_for('static', filename='icons/icon-192.png') }}" type="image/png">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=3">
   <script>
     (function() {
       var saved = localStorage.getItem('sl_theme');
@@ -70,7 +70,7 @@
       copiedBtn: "Copied!"
     };
   </script>
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}?v=3"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

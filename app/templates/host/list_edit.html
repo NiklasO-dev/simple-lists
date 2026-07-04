@@ -3,78 +3,85 @@
 {% block title %}{{ todo_list.title }} — Simple Lists{% endblock %}
 
 {% block content %}
-<header class="page-header">
+<header class="page-header list-edit-header">
   <p><a href="{{ url_for('host.dashboard') }}">← All lists</a></p>
-  <h1>{{ todo_list.title }}</h1>
-</header>
-
-<section class="share-section">
-  <h2>Share link</h2>
-  <p class="field-hint">Anyone with this link can add items and check them off{% if todo_list.is_locked %} after entering the list password{% endif %}. Only you can delete items or change settings.</p>
-  <div class="copy-row">
-    <input type="text" id="share-url" class="copy-input" value="{{ share_url }}" readonly>
-    <button type="button" class="copy-btn outline" data-copy-target="share-url">Copy</button>
+  <div class="list-edit-title-row">
+    <h1>{{ todo_list.title }}</h1>
+    <div class="page-actions">
+      <button type="button" class="copy-btn outline secondary page-action-btn" data-share-url="{{ share_url }}" data-copy-label="Share" aria-label="Copy share link">Share</button>
+      <button type="button" class="outline page-action-btn" data-open-dialog="list-settings" aria-label="List settings">Settings</button>
+    </div>
   </div>
-</section>
-
-<section>
-  <h2>Settings</h2>
-  <form method="post" action="{{ url_for('host.update_settings', list_id=todo_list.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <label>
-      List name
-      <input type="text" name="title" value="{{ todo_list.title }}" required maxlength="200">
-    </label>
-
-    <fieldset>
-      <legend>List password</legend>
-      {% if todo_list.is_locked %}
-      <p class="field-hint">This list is password-protected.</p>
-      <label class="checkbox-label">
-        <input type="radio" name="lock_action" value="keep" checked>
-        Keep current password
-      </label>
-      <label class="checkbox-label">
-        <input type="radio" name="lock_action" value="set">
-        Set new password
-      </label>
-      <label class="checkbox-label">
-        <input type="radio" name="lock_action" value="remove">
-        Remove password
-      </label>
-      {% else %}
-      <p class="field-hint">Optionally require a password before opening the share link.</p>
-      <label class="checkbox-label">
-        <input type="radio" name="lock_action" value="keep" checked>
-        No password
-      </label>
-      <label class="checkbox-label">
-        <input type="radio" name="lock_action" value="set">
-        Set password
-      </label>
-      {% endif %}
-      <label>
-        Password (when setting a new one)
-        <input type="password" name="list_password" autocomplete="new-password">
-      </label>
-    </fieldset>
-
-    <label class="checkbox-label">
-      <input type="checkbox" name="regenerate_token" value="1">
-      Generate a new share link (invalidates the old one)
-    </label>
-
-    <button type="submit">Save settings</button>
-  </form>
-</section>
+</header>
 
 {% include "partials/list_items.html" %}
 
-<section class="danger-zone">
-  <h2>Delete list</h2>
-  <form method="post" action="{{ url_for('host.delete_list', list_id=todo_list.id) }}" onsubmit="return confirm('Delete this list permanently?');">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button type="submit" class="outline contrast">Delete list</button>
-  </form>
-</section>
+<dialog id="list-settings" class="settings-dialog">
+  <article>
+    <header>
+      <button type="button" class="dialog-close" data-close-dialog aria-label="Close">&times;</button>
+      <h2>List settings</h2>
+    </header>
+
+    <form method="post" action="{{ url_for('host.update_settings', list_id=todo_list.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>
+        List name
+        <input type="text" name="title" value="{{ todo_list.title }}" required maxlength="200">
+      </label>
+
+      <fieldset>
+        <legend>List password</legend>
+        {% if todo_list.is_locked %}
+        <p class="field-hint">This list is password-protected.</p>
+        <label class="checkbox-label">
+          <input type="radio" name="lock_action" value="keep" checked>
+          Keep current password
+        </label>
+        <label class="checkbox-label">
+          <input type="radio" name="lock_action" value="set">
+          Set new password
+        </label>
+        <label class="checkbox-label">
+          <input type="radio" name="lock_action" value="remove">
+          Remove password
+        </label>
+        {% else %}
+        <p class="field-hint">Optionally require a password before opening the share link.</p>
+        <label class="checkbox-label">
+          <input type="radio" name="lock_action" value="keep" checked>
+          No password
+        </label>
+        <label class="checkbox-label">
+          <input type="radio" name="lock_action" value="set">
+          Set password
+        </label>
+        {% endif %}
+        <label>
+          Password (when setting a new one)
+          <input type="password" name="list_password" autocomplete="new-password">
+        </label>
+      </fieldset>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="regenerate_token" value="1">
+        Generate a new share link (invalidates the old one)
+      </label>
+
+      <p class="field-hint">Anyone with the share link can add items and check them off{% if todo_list.is_locked %} after entering the list password{% endif %}. Only you can delete items or change settings.</p>
+
+      <footer class="dialog-footer">
+        <button type="submit">Save settings</button>
+      </footer>
+    </form>
+
+    <section class="danger-zone">
+      <h3>Delete list</h3>
+      <form method="post" action="{{ url_for('host.delete_list', list_id=todo_list.id) }}" onsubmit="return confirm('Delete this list permanently?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="outline contrast">Delete list</button>
+      </form>
+    </section>
+  </article>
+</dialog>
 {% endblock %}

@@ -28,6 +28,37 @@ footer .footer-source {
   margin-bottom: 0.25rem;
 }
 
+.list-edit-header {
+  margin-bottom: 1rem;
+}
+
+.list-edit-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.list-edit-title-row h1 {
+  margin-bottom: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.page-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.35rem;
+}
+
+.page-action-btn {
+  width: auto;
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 .action-row {
   display: flex;
   flex-wrap: wrap;
@@ -226,14 +257,69 @@ footer .footer-source {
   line-height: 1;
 }
 
-.share-section {
-  margin-bottom: 2rem;
+.items-section {
+  margin-top: 0;
+}
+
+.settings-dialog {
+  padding: 0;
+  border: none;
+  max-width: 32rem;
+  width: calc(100% - 2rem);
+}
+
+.settings-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.settings-dialog article {
+  margin: 0;
+  max-height: min(85vh, 40rem);
+  overflow-y: auto;
+}
+
+.settings-dialog header {
+  position: relative;
+  padding-right: 2.5rem;
+}
+
+.settings-dialog header h2 {
+  margin-bottom: 0;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  padding: 0;
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.dialog-footer button {
+  width: auto;
+  margin: 0;
 }
 
 .danger-zone {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--pico-muted-border-color);
+}
+
+.danger-zone h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
 }
 
 .landing {
@@ -292,14 +378,21 @@ footer .footer-source {
 }
 
 @media (max-width: 576px) {
-  .copy-row,
-  .inline-add {
+  .copy-row {
     flex-direction: column;
   }
 
-  .inline-add button,
   .copy-row .copy-btn {
     width: 100%;
+  }
+
+  .list-edit-title-row {
+    flex-wrap: wrap;
+  }
+
+  .page-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 

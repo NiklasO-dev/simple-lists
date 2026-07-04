@@ -15,26 +15,67 @@ Lightweight shared todo lists — no accounts, just shareable links. The host ma
 
 ## Local development
 
-Requires [uv](https://docs.astral.sh/uv/).
+### Environment file
+
+Local Compose loads settings from a `.env` file in the project root (`env_file` in `docker-compose.local.yml`). Create it once before starting the container:
+
+```bash
+cp .env.example .env
+```
+
+For local development, set at least:
+
+```env
+SECRET_KEY=dev-local-secret-change-me
+HOST_PASSWORD=dev-host-password
+APP_BASE_URL=http://localhost:8080
+SL_ALLOW_DEV_SECRET=1
+```
+
+`SL_ALLOW_DEV_SECRET=1` is required when using placeholder secrets locally — the app refuses to start with known dev defaults otherwise. Share links use `APP_BASE_URL`, so keep it aligned with the port you open in the browser.
+
+The SQLite database is stored in `./data` (mounted into the container). Your lists persist across restarts.
+
+### Run with Podman Compose (recommended)
+
+Matches the production container setup on port **8080**:
+
+```bash
+mkdir -p data
+podman compose -f docker-compose.local.yml up -d --build
+```
+
+Open http://localhost:8080 and log in with the `HOST_PASSWORD` from your `.env`.
+
+**After code or template changes**, rebuild and recreate the container (a plain `restart` reuses the old image):
+
+```bash
+podman compose -f docker-compose.local.yml up -d --build --force-recreate
+```
+
+Stop the stack:
+
+```bash
+podman compose -f docker-compose.local.yml down
+```
+
+If the UI looks stale after a deploy, hard-refresh the browser (Ctrl+Shift+R) so the service worker and static assets reload.
+
+`docker compose` works the same way if you use Docker instead of Podman.
+
+### Run with uv (Flask dev server)
+
+Requires [uv](https://docs.astral.sh/uv/). Useful for quick Python debugging on port **5000**:
 
 ```bash
 uv sync
 mkdir -p data
-export SL_ALLOW_DEV_SECRET=1
-export SECRET_KEY=dev-local-secret-change-me
-export HOST_PASSWORD=dev-host-password
-export APP_BASE_URL=http://127.0.0.1:5000
-export BEHIND_PROXY=0
+cp .env.example .env   # then edit as above; use APP_BASE_URL=http://127.0.0.1:5000
+set -a && source .env && set +a
 uv run flask --app wsgi run --debug
 ```
 
-Or with Docker:
-
-```bash
-docker compose -f docker-compose.local.yml up --build
-```
-
-Open http://localhost:8080
+Open http://127.0.0.1:5000
 
 ## Production deployment (Caddy)
 
@@ -102,6 +143,8 @@ Keep share links private — they are the primary access control for participant
 ```
 
 ## Environment variables
+
+Copy `.env.example` to `.env` for local development. Compose (`docker-compose.local.yml`) reads this file automatically; production deployment uses the same pattern.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
