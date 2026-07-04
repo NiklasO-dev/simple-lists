@@ -236,6 +236,61 @@ footer .footer-source {
   border-top: 1px solid var(--pico-muted-border-color);
 }
 
+.landing {
+  text-align: center;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.landing-header {
+  margin-bottom: 1.5rem;
+}
+
+.landing-icon {
+  border-radius: 16px;
+  margin-bottom: 0.75rem;
+}
+
+.landing-lead {
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.owner-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--pico-muted-border-color);
+  text-align: left;
+}
+
+.owner-section h2 {
+  margin-bottom: 0.35rem;
+}
+
+.install-hint {
+  margin-top: 2rem;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--pico-muted-color);
+}
+
+.install-hint summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--pico-color);
+}
+
+.install-hint ul {
+  margin-bottom: 0;
+  padding-left: 1.25rem;
+}
+
+@media (display-mode: standalone) {
+  .install-hint {
+    display: none;
+  }
+}
+
 @media (max-width: 576px) {
   .copy-row,
   .inline-add {

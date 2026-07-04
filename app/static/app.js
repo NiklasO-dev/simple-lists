@@ -1,4 +1,10 @@
 (function () {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function () {});
+    });
+  }
+
   var btn = document.getElementById("theme-toggle");
   var i18n = window.SL_I18N || {};
   if (btn) {

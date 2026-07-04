@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, redirect, render_template, request, send_from_directory, url_for
 
 from app.auth import is_host_authenticated
 
@@ -8,6 +8,23 @@ bp = Blueprint("public", __name__)
 @bp.route("/health")
 def health():
     return {"status": "ok"}
+
+
+@bp.route("/manifest.webmanifest")
+def manifest():
+    return send_from_directory(
+        current_app.static_folder,
+        "manifest.webmanifest",
+        mimetype="application/manifest+json",
+    )
+
+
+@bp.route("/sw.js")
+def service_worker():
+    response = send_from_directory(current_app.static_folder, "sw.js", mimetype="application/javascript")
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Service-Worker-Allowed"] = "/"
+    return response
 
 
 @bp.route("/")

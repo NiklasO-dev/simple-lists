@@ -11,6 +11,7 @@ Lightweight shared todo lists — no accounts, just shareable links. The host ma
 - Export / import all lists as JSON (includes share tokens, items, and list passwords)
 - SQLite backend, Docker-ready for Caddy reverse proxy
 - Mobile-first UI with Pico CSS
+- Installable as a home-screen web app on Android and iOS (PWA manifest + service worker)
 
 ## Local development
 
