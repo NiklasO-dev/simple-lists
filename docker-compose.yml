@@ -1,0 +1,23 @@
+services:
+  simple-lists:
+    build: .
+    container_name: simple-lists
+    restart: unless-stopped
+    expose:
+      - "8080"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite:////data/simple_lists.db
+      BEHIND_PROXY: "1"
+    volumes:
+      - sl_data:/data
+    networks:
+      - caddy_net
+
+volumes:
+  sl_data:
+
+networks:
+  caddy_net:
+    external: true

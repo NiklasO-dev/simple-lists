@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Host login — Simple Lists{% endblock %}
+
+{% block content %}
+<article>
+  <header>
+    <h1>Host login</h1>
+    <p>Enter the host password configured when this instance was started.</p>
+  </header>
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+    <label>
+      Password
+      <input type="password" name="password" required autofocus autocomplete="current-password">
+    </label>
+    <button type="submit">Log in</button>
+  </form>
+</article>
+{% endblock %}

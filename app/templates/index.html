@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Simple Lists — shared todo lists{% endblock %}
+
+{% block content %}
+<article>
+  <header>
+    <h1>Simple Lists</h1>
+    <p>Lightweight shared lists for groceries, packing, chores — no accounts, just links.</p>
+  </header>
+
+  <section>
+    <h2>How it works</h2>
+    <ol>
+      <li>The <strong>host</strong> logs in with the password set when the container starts.</li>
+      <li>Create lists and copy a share link for family or friends.</li>
+      <li>Everyone can add items and check them off. Optional per-list passwords available.</li>
+      <li>Export and import all lists as JSON for backup or migration.</li>
+    </ol>
+  </section>
+
+  <p>
+    <a href="{{ url_for('host.login') }}" role="button">Host login</a>
+  </p>
+</article>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Simple Lists{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    (function() {
+      var saved = localStorage.getItem('sl_theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><strong><a href="{{ url_for('public.index') }}">Simple Lists</a></strong></li>
+      </ul>
+      <ul>
+        {% if is_host %}
+        <li><a href="{{ url_for('host.dashboard') }}">Manage lists</a></li>
+        <li>
+          <form method="post" action="{{ url_for('host.logout') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="outline secondary">Log out</button>
+          </form>
+        </li>
+        {% else %}
+        <li><a href="{{ url_for('host.login') }}">Host login</a></li>
+        {% endif %}
+        <li>
+          <button type="button" id="theme-toggle" class="theme-toggle-btn outline secondary" aria-label="Toggle theme">🌙</button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container">
+    <small>Shared lists without accounts — just links.</small>
+    <small class="footer-source"><a href="{{ git_repo_url }}" target="_blank" rel="noopener">Source on GitHub</a></small>
+  </footer>
+
+  <script>
+    window.SL_I18N = {
+      copyBtn: "Copy",
+      copiedBtn: "Copied!"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ todo_list.title }} — Simple Lists{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <h1>{{ todo_list.title }}</h1>
+  {% if todo_list.is_locked %}
+  <p class="field-hint">🔒 Password protected</p>
+  {% endif %}
+</header>
+
+{% include "partials/list_items.html" %}
+{% endblock %}

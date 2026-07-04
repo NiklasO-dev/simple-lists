@@ -1,0 +1,16 @@
+[project]
+name = "simple-lists"
+version = "0.1.0"
+description = "Simple shared lists — host-managed, shareable links, no accounts"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.0,<4",
+    "flask-sqlalchemy>=3.1,<4",
+    "gunicorn>=22,<24",
+    "python-dotenv>=1.0,<2",
+    "itsdangerous>=2.2,<3",
+]
+
+[dependency-groups]
+dev = []
