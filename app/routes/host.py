@@ -36,6 +36,8 @@ def login():
         require_csrf()
         if is_rate_limited("host_login"):
             flash("Too many failed attempts. Please wait a few minutes and try again.", "error")
+            if request.form.get("from_landing"):
+                return render_template("index.html"), 429
             return render_template("host/login.html"), 429
         password = request.form.get("password", "")
         if verify_host_password(password):
@@ -47,6 +49,10 @@ def login():
             return redirect(url_for("host.dashboard"))
         record_failed_attempt("host_login")
         flash("Incorrect password.", "error")
+        if request.form.get("from_landing"):
+            return render_template("index.html"), 401
+    if request.args.get("from_landing"):
+        return render_template("index.html")
     return render_template("host/login.html")
 
 
@@ -95,6 +101,7 @@ def update_settings(list_id: int):
     if title:
         todo_list.title = title
 
+    settings_error = False
     lock_action = request.form.get("lock_action", "keep")
     if lock_action == "set":
         password = request.form.get("list_password", "")
@@ -102,6 +109,7 @@ def update_settings(list_id: int):
             todo_list.set_list_password(current_app.config["SECRET_KEY"], password)
         else:
             flash("Enter a password to lock the list, or choose another option.", "error")
+            settings_error = True
     elif lock_action == "remove":
         todo_list.clear_list_password()
 
@@ -109,7 +117,8 @@ def update_settings(list_id: int):
         todo_list.share_token = generate_token()
 
     db.session.commit()
-    flash("Settings saved.", "success")
+    if not settings_error:
+        flash("Settings saved.", "success")
     return redirect(url_for("host.edit_list", list_id=list_id))
 
 

@@ -25,6 +25,7 @@
 
     <form method="post" action="{{ url_for('host.login') }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="from_landing" value="1">
       <label>
         Host password
         <input type="password" name="password" required autofocus autocomplete="current-password">

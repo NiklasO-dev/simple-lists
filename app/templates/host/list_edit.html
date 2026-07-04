@@ -10,7 +10,7 @@
 
 <section class="share-section">
   <h2>Share link</h2>
-  <p class="field-hint">Anyone with this link can view and edit the list{% if todo_list.is_locked %} after entering the list password{% endif %}.</p>
+  <p class="field-hint">Anyone with this link can add items and check them off{% if todo_list.is_locked %} after entering the list password{% endif %}. Only you can delete items or change settings.</p>
   <div class="copy-row">
     <input type="text" id="share-url" class="copy-input" value="{{ share_url }}" readonly>
     <button type="button" class="copy-btn outline" data-copy-target="share-url">Copy</button>

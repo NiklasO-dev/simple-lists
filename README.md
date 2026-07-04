@@ -75,8 +75,8 @@ Ensure `simple-lists` is covered by your wildcard `*.${APPS_DOMAIN}` record.
 
 | Link | Path | Purpose |
 |------|------|---------|
-| Host login | `/host/login` | Host authentication |
-| Host dashboard | `/host/` | Manage all lists |
+| Landing | `/` | Private-app info and owner login |
+| Host dashboard | `/host/` | Manage all lists (after login) |
 | Share link | `/l/{share_token}` | Collaborate on a list |
 
 Keep share links private — they are the primary access control for participants.

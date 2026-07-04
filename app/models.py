@@ -49,7 +49,7 @@ class TodoList(db.Model):
         self.updated_at = utcnow()
 
     def add_item(self, text: str) -> dict:
-        text = text.strip()
+        text = text.strip()[:500]
         if not text:
             raise ValueError("Item text cannot be empty")
         items = self.get_items()
