@@ -1,8 +1,8 @@
-const CACHE = "simple-lists-v3";
+const CACHE = "simple-lists-v4";
 const STATIC_ASSETS = [
   "/static/style.css",
   "/static/app.js",
-  "/static/manifest.webmanifest",
+  "/manifest.webmanifest",
   "/static/icons/icon-192.png",
   "/static/icons/icon-512.png",
   "/static/icons/apple-touch-icon.png",

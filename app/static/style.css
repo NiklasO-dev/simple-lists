@@ -134,6 +134,18 @@ footer .footer-source {
   margin: 0;
 }
 
+/* Prevent iOS Safari from zooming the page when focusing inputs (< 16px triggers zoom). */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+  font-size: 16px;
+}
+
 .inline-add {
   display: flex;
   gap: 0.5rem;
