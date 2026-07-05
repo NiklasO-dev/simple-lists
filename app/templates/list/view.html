@@ -11,4 +11,8 @@
 </header>
 
 {% include "partials/list_items.html" %}
+
+{% with hint_lead="Install this list as a home screen shortcut — it opens directly to this list:" %}
+{% include "partials/install_hint.html" %}
+{% endwith %}
 {% endblock %}

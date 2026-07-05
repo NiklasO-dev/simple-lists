@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app, redirect, render_template, request, send_from_directory, url_for
 
 from app.auth import is_host_authenticated
+from app.pwa import manifest_response
 
 bp = Blueprint("public", __name__)
 
@@ -12,10 +13,10 @@ def health():
 
 @bp.route("/manifest.webmanifest")
 def manifest():
-    return send_from_directory(
-        current_app.static_folder,
-        "manifest.webmanifest",
-        mimetype="application/manifest+json",
+    return manifest_response(
+        name="Simple Lists",
+        short_name="Lists",
+        start_url="/",
     )
 
 
