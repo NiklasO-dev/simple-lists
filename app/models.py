@@ -48,6 +48,10 @@ class TodoList(db.Model):
         self.items_json = json.dumps(items)
         self.updated_at = utcnow()
 
+    @staticmethod
+    def _sort_items(items: list[dict]) -> list[dict]:
+        return sorted(items, key=lambda i: i.get("text", "").casefold())
+
     def add_item(self, text: str) -> dict:
         text = text.strip()[:500]
         if not text:
@@ -55,7 +59,7 @@ class TodoList(db.Model):
         items = self.get_items()
         item = {"id": generate_item_id(), "text": text, "completed": False}
         items.append(item)
-        self.set_items(items)
+        self.set_items(self._sort_items(items))
         return item
 
     def toggle_item(self, item_id: str) -> bool:
